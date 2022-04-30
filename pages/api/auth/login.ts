@@ -22,7 +22,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(401).json({ message: 'Incorrect password' });
       }
       const token = jwt.sign(
-        { email: user.email, role: user.role },
+        { email: user.email, role: user.role, _id: user._id },
         process.env.JWT_SECRET as string
       );
       return res.status(200).json({

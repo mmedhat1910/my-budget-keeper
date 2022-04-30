@@ -3,11 +3,54 @@ import { HydratedDocument } from 'mongoose';
 import AccountInterface from './../interfaces/Account';
 import User from './../models/User';
 import UserInterface from './../interfaces/User';
+import StatusError from '../lib/StatusError';
+
+export const getAccounts = async () => {
+  try {
+    const accounts = await Account.find({});
+    if (!accounts) {
+      throw new StatusError('No Account found', 404);
+    }
+    return accounts;
+  } catch (err) {
+    throw err;
+  }
+};
+export const getAccountById = async (
+  id: string,
+  owner_id: string,
+  role: string
+) => {
+  try {
+    if (role === 'admin') {
+      const account = await Account.findById(id);
+      if (!account) {
+        throw new StatusError('Account not found', 404);
+      }
+      return account;
+    } else {
+      const account = await Account.findOne({ _id: id });
+      if (!account) {
+        throw new StatusError('Account not found', 404);
+      }
+      if (account.owner_id !== owner_id) {
+        throw new StatusError(
+          'You are not authorized to view this account',
+          403
+        );
+      }
+
+      return account;
+    }
+  } catch (err) {
+    throw err;
+  }
+};
 
 export const getAccountsByUserId = async (id: string) => {
-  const account = await Account.find({ user_id: id });
+  const account = await Account.find({ owner_id: id });
   if (!account) {
-    throw new Error('Account not found');
+    throw new StatusError('Account not found', 404);
   }
   return account;
 };
@@ -15,7 +58,7 @@ export const getAccountsByUserId = async (id: string) => {
 export const getSharedAccountsByUserId = async (id: string) => {
   const account = await Account.find({ shared_ids: id });
   if (!account) {
-    throw new Error('Account not found');
+    throw new StatusError('Account not found', 404);
   }
   return account;
 };

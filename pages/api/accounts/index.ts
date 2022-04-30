@@ -1,15 +1,23 @@
 import { NextApiHandler } from 'next';
 import withAuth from '../../../middlewares/withAuth';
 import Account from '../../../models/Account';
-
+import AccountInterface from '../../../interfaces/Account';
+import { getAccounts, getAccountsByUserId } from '../../../controllers/account';
 const handler: NextApiHandler = async (req, res) => {
   try {
+    const decodedToken = req.body.decoded;
+    console.log(decodedToken);
     if (req.method === 'GET') {
-      const accounts = await Account.find();
+      let accounts: AccountInterface[];
+      if (decodedToken.role === 'admin') {
+        accounts = await getAccounts();
+      } else {
+        accounts = await getAccountsByUserId(decodedToken._id);
+      }
       if (!accounts) {
         return res.status(404).json({ message: 'No accounts found' });
       }
-      return res.status(200).json({ accounts });
+      return res.status(200).json(accounts);
     } else if (req.method === 'POST') {
       const account = req.body.account;
       if (!account) {

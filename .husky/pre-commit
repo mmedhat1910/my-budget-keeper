@@ -1,0 +1,34 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+npm run precommit
+
+echo '🛠  🧪  Styling, testing and building you project before committing  🧪  🛠'
+
+ #Check tsconfig standards
+
+npm run check:types || 
+(
+    echo '❌ 😠 Failed Type Check 😠 ❌
+        Make the changes required above!';
+    false;
+
+)
+
+npm run check:format || 
+(
+    echo '😤 Failed format check ! 😤
+        Prettier check failed. Formatting was applied, try commiting again';
+    npm run format
+    git add .
+
+)
+
+npm run lint || 
+(
+    echo '🙎🏻‍♂️  Failed lint check! 🙎🏻‍♂️
+            ESLint Check failed. Make the required changes mentioned above and try commiting again';
+    false;
+)
+
+echo '🤩 ..Alright.. Your code is committed ⚙️'

@@ -6,7 +6,7 @@ export default interface Transaction {
   date: mongoose.Date;
   amount: number;
   category_id: mongoose.ObjectId;
-  payee_id: mongoose.ObjectId;
+  payer_id: mongoose.ObjectId;
   notes: string;
   cleared: boolean;
   type: 'expense' | 'income';

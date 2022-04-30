@@ -27,6 +27,11 @@ const AccountSchema = new Schema<Account>({
     ref: 'User',
     required: false,
   },
+  initial_balance: {
+    type: Number,
+    required: false,
+    default: 0.0,
+  },
 });
 
 export default mongoose.models.Account || model('Account', AccountSchema);

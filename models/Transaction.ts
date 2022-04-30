@@ -13,7 +13,7 @@ const TransactionSchema = new Schema<Transaction>({
     required: true,
   },
   category_id: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
-  payee_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  payer_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   notes: {
     type: String,
     required: false,

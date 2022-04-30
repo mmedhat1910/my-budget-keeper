@@ -5,4 +5,5 @@ export default interface Account {
   owner_id: string;
   active: boolean;
   shared_ids: { id: mongoose.ObjectId; privilege: 'r' | 'rw' }[];
+  initial_balance: number;
 }

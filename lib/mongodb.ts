@@ -38,7 +38,7 @@ async function dbConnect() {
     //   useFindAndModify: true,
     //   useCreateIndex: true
     // }
-    console.log(DATABASE_URL);
+    // console.log(DATABASE_URL);
     cached.promise = mongoose.connect(DATABASE_URL).then((mongoose) => {
       console.log('Database connection established');
       return mongoose;

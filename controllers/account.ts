@@ -33,7 +33,7 @@ export const getAccountById = async (
       if (!account) {
         throw new StatusError('Account not found', 404);
       }
-      if (account.owner_id !== owner_id) {
+      if (account.owner_id.toString() !== owner_id) {
         throw new StatusError(
           'You are not authorized to view this account',
           403
@@ -48,11 +48,26 @@ export const getAccountById = async (
 };
 
 export const getAccountsByUserId = async (id: string) => {
-  const account = await Account.find({ owner_id: id });
-  if (!account) {
-    throw new StatusError('Account not found', 404);
+  try {
+    const account = await Account.find({
+      $or: [
+        { owner_id: id },
+        {
+          shared_ids: {
+            $elemMatch: {
+              id: id,
+            },
+          },
+        },
+      ],
+    });
+    if (!account) {
+      throw new StatusError('Account not found', 404);
+    }
+    return account;
+  } catch (err) {
+    throw err;
   }
-  return account;
 };
 
 export const getSharedAccountsByUserId = async (id: string) => {
@@ -86,21 +101,76 @@ export const createAccount = async ({
   return newAccount;
 };
 
+export const deleteAccount = async ({
+  id,
+  owner_id,
+  role,
+}: {
+  id: string;
+  owner_id: string;
+  role: string;
+}): Promise<void> => {
+  try {
+    let deleted;
+    const account = await Account.findOne({ _id: id });
+    if (!account) {
+      throw new StatusError('Account not found', 404);
+    }
+    if (role !== 'admin' && account.owner_id.toString() !== owner_id) {
+      throw new StatusError(
+        'You are not authorized to delete this account',
+        403
+      );
+    }
+    deleted = await account.remove();
+    if (!deleted) {
+      throw new StatusError('Something went wrong', 500);
+    }
+    return deleted;
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const shareAccount = async ({
   account_id,
-  user_email,
-  privilege,
+  shared_accounts,
+  owner_id,
+  role,
 }: {
   account_id: string;
-  user_email: string;
-  privilege: string;
+  shared_accounts: { email: string; privilege: 'r' | 'rw' }[];
+  owner_id: string;
+  role: string;
 }) => {
   const account = await Account.findById(account_id);
-  const user = await User.findOne({ email: user_email });
-  if (!account || !user) {
-    throw new Error('Account not found or user not found');
+  if (!account) {
+    throw new StatusError('Account not found', 404);
   }
-  account.shared_ids.push({ id: user._id, privilege: privilege });
+  if (role !== 'admin' && account.owner_id.toString() !== owner_id) {
+    throw new StatusError('You are not authorized to share this account', 403);
+  }
+
+  const users = await User.find({
+    email: { $in: shared_accounts.map((user) => user.email) },
+  });
+  // add _id of each user to shared_users array
+  const users_with_id = users.map((user) => {
+    return {
+      id: user._id,
+      privilege: shared_accounts.find((u) => u.email === user.email)?.privilege,
+    };
+  });
+  console.log(users);
+  console.log(users_with_id);
+  if (!account) {
+    throw new StatusError('Account not found', 404);
+  }
+  if (!users) {
+    throw new StatusError('User not found', 404);
+  }
+
+  account.shared_ids.push(users_with_id);
   const newAccount = await account.save();
   if (!newAccount) {
     throw new Error('Account not shared');

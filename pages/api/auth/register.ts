@@ -32,7 +32,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       return res.status(500).json({ message: (error as Error).message });
     }
   } else {
-    res.status(409).json({ message: 'No Route Found' });
+    res.status(405).json({ message: 'No Route Found' });
   }
 };
 

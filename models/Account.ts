@@ -16,7 +16,12 @@ const AccountSchema = new Schema<Account>({
     type: [
       {
         id: Schema.Types.ObjectId,
-        privilege: { type: String, required: true, enum: ['r', 'rw'] },
+        privilege: {
+          type: String,
+          required: false,
+          default: 'r',
+          enum: ['r', 'rw'],
+        },
       },
     ],
     ref: 'User',

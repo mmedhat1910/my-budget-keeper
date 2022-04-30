@@ -4,6 +4,7 @@ import AccountInterface from './../interfaces/Account';
 import User from './../models/User';
 import UserInterface from './../interfaces/User';
 import StatusError from '../lib/StatusError';
+import mongoose from 'mongoose';
 
 export const getAccounts = async () => {
   try {
@@ -139,11 +140,12 @@ export const shareAccount = async ({
   role,
 }: {
   account_id: string;
-  shared_accounts: { email: string; privilege: 'r' | 'rw' }[];
+  shared_accounts: string[];
   owner_id: string;
   role: string;
 }) => {
-  const account = await Account.findById(account_id);
+  const account: HydratedDocument<AccountInterface> | null =
+    await Account.findById(account_id);
   if (!account) {
     throw new StatusError('Account not found', 404);
   }
@@ -152,17 +154,17 @@ export const shareAccount = async ({
   }
 
   const users = await User.find({
-    email: { $in: shared_accounts.map((user) => user.email) },
+    email: { $in: shared_accounts },
   });
   // add _id of each user to shared_users array
-  const users_with_id = users.map((user) => {
-    return {
-      id: user._id,
-      privilege: shared_accounts.find((u) => u.email === user.email)?.privilege,
-    };
-  });
-  console.log(users);
-  console.log(users_with_id);
+  const users_with_id: { id: mongoose.ObjectId; privilege: 'r' | 'rw' }[] =
+    users.map((user) => {
+      return {
+        id: user._id,
+        privilege: 'r',
+      };
+    });
+
   if (!account) {
     throw new StatusError('Account not found', 404);
   }
@@ -170,7 +172,7 @@ export const shareAccount = async ({
     throw new StatusError('User not found', 404);
   }
 
-  account.shared_ids.push(users_with_id);
+  account.shared_ids = [...account.shared_ids, ...users_with_id];
   const newAccount = await account.save();
   if (!newAccount) {
     throw new Error('Account not shared');

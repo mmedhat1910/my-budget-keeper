@@ -1,10 +1,15 @@
+import bcrypt from 'bcrypt';
 import User from './../models/User';
 export const getUserByEmail = async (email: string) => {
-  const user = await User.findOne({ email });
-  if (user) {
+  try {
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      throw new Error('User not found');
+    }
     return user;
+  } catch (err) {
+    throw err;
   }
-  return null;
 };
 
 export const createUser = async (
@@ -13,6 +18,7 @@ export const createUser = async (
   name: string
 ) => {
   try {
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
       email,
       password,

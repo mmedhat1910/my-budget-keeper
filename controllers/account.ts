@@ -1,8 +1,8 @@
-import Account from '@models/Account';
+import Account from './../models/Account';
 import { HydratedDocument } from 'mongoose';
-import AccountInterface from '@interfaces/Account';
-import User from '@models/User';
-import UserInterface from '@interfaces/User';
+import AccountInterface from './../interfaces/Account';
+import User from './../models/User';
+import UserInterface from './../interfaces/User';
 
 export const getAccountsByUserId = async (id: string) => {
   const account = await Account.find({ user_id: id });

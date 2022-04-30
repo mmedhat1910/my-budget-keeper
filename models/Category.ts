@@ -1,4 +1,4 @@
-import Category from '@interfaces/Category';
+import Category from './../interfaces/Category';
 import mongoose, { model, Schema } from 'mongoose';
 
 const CategorySchema = new Schema<Category>({

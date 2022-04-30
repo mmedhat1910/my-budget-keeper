@@ -1,4 +1,4 @@
-import Account from '@interfaces/Account';
+import Account from './../interfaces/Account';
 import mongoose, { model, Schema } from 'mongoose';
 
 const AccountSchema = new Schema<Account>({

@@ -1,4 +1,4 @@
-import Transaction from '@models/Transaction';
+import Transaction from './../models/Transaction';
 
 export const getTransitionsById = async (userId: string) => {
   const transactions = await Transaction.find({ user_id: userId });

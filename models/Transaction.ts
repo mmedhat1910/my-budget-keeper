@@ -1,4 +1,4 @@
-import Transaction from '@interfaces/Transaction';
+import Transaction from './../interfaces/Transaction';
 import mongoose, { model, Schema } from 'mongoose';
 
 const TransactionSchema = new Schema<Transaction>({

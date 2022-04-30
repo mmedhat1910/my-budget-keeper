@@ -1,6 +1,17 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '../lib/mongodb';
 import jwt from 'jsonwebtoken';
+import initMiddleware from './initMiddleware';
+import Cors from 'cors';
+
+const cors = initMiddleware(
+  // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
+  Cors({
+    // Only allow requests with GET, POST and OPTIONS
+    methods: ['GET', 'POST', 'OPTIONS'],
+  })
+);
+
 const withAuth = (handler: NextApiHandler): NextApiHandler => {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     await dbConnect();

@@ -3,6 +3,7 @@ import { createUser } from '../../../controllers/user';
 import User from './../../../models/User';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import withAuth from '../../../middlewares/withAuth';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     try {
@@ -24,7 +25,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         { email: user.email, role: user.role },
         process.env.JWT_SECRET as string
       );
-      return res.status(200).json({ message: 'User authenticated', token });
+      return res.status(200).json({
+        message: 'User authenticated',
+        token,
+        user: { ...user._doc, password: '<secret>' },
+      });
     } catch (error) {
       return res.status(500).json({ message: (error as Error).message });
     }
@@ -33,4 +38,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default handler;
+export default withAuth(handler);

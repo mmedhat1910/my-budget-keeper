@@ -9,7 +9,8 @@ const AccountSchema = new Schema<Account>({
   owner_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   active: {
     type: Boolean,
-    required: true,
+    required: false,
+    default: true,
   },
   shared_ids: {
     type: [

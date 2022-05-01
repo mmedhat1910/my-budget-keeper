@@ -1,11 +1,16 @@
 import {
+  ExclamationCircleIcon,
+  ExclamationIcon,
   EyeIcon,
   EyeOffIcon,
   InformationCircleIcon,
 } from '@heroicons/react/outline';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import { getCookie, setCookies } from 'cookies-next';
+import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
 import React, { FormEventHandler, useRef, useState } from 'react';
-
+import ReactLoading from 'react-loading';
 import Layout from '../../components/Layout';
 import ThemeToggler from '../../components/ThemeToggler';
 
@@ -17,9 +22,20 @@ interface FormValues {
 const Login = () => {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState({
+    show: false,
+    message: '' as string,
+  });
+  const router = useRouter();
   const onLogin: FormEventHandler = async (e) => {
     e.preventDefault();
     try {
+      setErrorMessage({
+        show: false,
+        message: '',
+      });
+      setIsLoading(true);
       const { status, data } = await axios({
         method: 'post',
         url: '/api/auth/login',
@@ -28,8 +44,25 @@ const Login = () => {
           password: passwordRef.current?.value,
         },
       });
-      console.log(data);
+      setIsLoading(false);
+      if (status === 200) {
+        setCookies('token', data.token);
+
+        router.push('/');
+      }
     } catch (error) {
+      setIsLoading(false);
+      if (error instanceof AxiosError) {
+        setErrorMessage({
+          show: true,
+          message: error.response?.data?.message || 'Something went wrong',
+        });
+      } else {
+        setErrorMessage({
+          show: true,
+          message: 'Something went wrong',
+        });
+      }
       console.log((error as Error).message);
     }
   };
@@ -64,6 +97,7 @@ const Login = () => {
           <form className="mt-12" onSubmit={onLogin}>
             <div className="relative">
               <input
+                required
                 id="email"
                 name="email"
                 type="text"
@@ -81,6 +115,7 @@ const Login = () => {
             <div className="mt-10 relative">
               <div className="flex  border-gray-300 border-b-2 focus:border-red-500 focus-within:border-cyan-600">
                 <input
+                  required
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   name="password"
@@ -107,8 +142,16 @@ const Login = () => {
                 </label>
               </div>
             </div>
-
-            <button className="mt-20 px-4 py-2 rounded bg-cyan-500 active:bg-cyan-600 text-white font-semibold text-center block w-full cursor-pointer">
+            <div className="mt-10 h-2 flex items-center justify-center">
+              {isLoading && <ReactLoading type="bubbles" color="#fff" />}
+              {errorMessage.show && (
+                <p className="text-red-500 italic flex items-center gap-2">
+                  <ExclamationIcon className="w-6" />
+                  {errorMessage.message}
+                </p>
+              )}
+            </div>
+            <button className="mt-10 px-4 py-2 rounded bg-cyan-500 active:bg-cyan-600 text-white font-semibold text-center block w-full cursor-pointer">
               Sign in
             </button>
           </form>
@@ -117,7 +160,7 @@ const Login = () => {
             className="mt-4 block text-sm text-center font-medium text-cyan-600 hover:underline focus:outline-none focus:ring-2 focus:ring-cyan-500"
           >
             {' '}
-            Forgot your password?{' '}
+            {/* Forgot your password?{' '} */}
           </a>
         </div>
       </div>
@@ -126,3 +169,15 @@ const Login = () => {
 };
 
 export default Login;
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { req } = ctx;
+  const token = req.cookies.token;
+  if (token) {
+    ctx.res.writeHead(302, {
+      Location: '/',
+    });
+    ctx.res.end();
+  }
+  return { props: {} };
+};

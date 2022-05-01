@@ -1,9 +1,12 @@
 import Layout from './../components/Layout';
-import type { NextPage } from 'next';
+import type { GetStaticProps, NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/Home.module.css';
-
+import { getCookie } from 'cookies-next';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import ReactLoading from 'react-loading';
 const Home: NextPage = () => {
   return (
     <div>
@@ -17,6 +20,20 @@ const Home: NextPage = () => {
       </Layout>
     </div>
   );
+};
+
+export const getStaticProps: GetStaticProps = async (ctx) => {
+  // if (!token) {
+  //   return {
+  //     redirect: {
+  //       destination: '/auth/login',
+  //     },
+  //     props: {},
+  //   };
+  // }
+  return {
+    props: {},
+  };
 };
 
 export default Home;

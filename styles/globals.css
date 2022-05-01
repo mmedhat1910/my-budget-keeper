@@ -11,6 +11,10 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
+.form-control {
+  @apply flex flex-col w-full;
+}
+
 a {
   color: inherit;
   text-decoration: none;

@@ -11,6 +11,13 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  padding-left: 1rem;
+}
+
 .form-control {
   @apply flex flex-col w-full;
 }

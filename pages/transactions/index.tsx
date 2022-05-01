@@ -1,4 +1,4 @@
-import { getCookies } from 'cookies-next';
+import { getCookie, getCookies } from 'cookies-next';
 import { GetStaticProps } from 'next';
 import React from 'react';
 import Layout from '../../components/Layout';
@@ -12,7 +12,8 @@ const Transactions = () => {
 };
 
 export const getStaticProps: GetStaticProps = async (ctx) => {
-  console.log(ctx);
+  const token = getCookie('token');
+  console.log(token);
   return {
     props: {},
   };

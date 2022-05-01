@@ -6,11 +6,11 @@ import React from 'react';
 const BottomNav = () => {
   const router = useRouter();
   return (
-    <div className=" w-full h-16 fixed bottom-0 bg-white flex items-center justify-evenly">
+    <div className=" w-full h-16 fixed bottom-0 bg-white dark:bg-slate-800 dark:text-white flex items-center justify-evenly rounded-t-2xl">
       <Link href={'/'} passHref>
         <span
           className={`flex flex-col items-center ${
-            router.pathname === '/' ? 'text-blue-500' : ''
+            router.pathname === '/' ? 'text-cyan-500' : ''
           }`}
         >
           <HomeIcon className="w-6" />
@@ -19,7 +19,7 @@ const BottomNav = () => {
       </Link>
 
       <Link href="/transactions/create" passHref>
-        <span className="bg-blue-500 p-5 rounded-full text-white shadow-lg absolute bottom-5 ">
+        <span className="bg-cyan-500 p-5 rounded-full text-white shadow-lg absolute -translate-y-1/2 ">
           <PlusIcon className="w-6" />
         </span>
       </Link>
@@ -27,7 +27,7 @@ const BottomNav = () => {
       <Link href={'/transactions'} passHref>
         <span
           className={`flex flex-col items-center pl-24 ${
-            router.pathname === '/transactions' ? 'text-blue-500' : ''
+            router.pathname === '/transactions' ? 'text-cyan-500' : ''
           }`}
         >
           <ClockIcon className="w-6" />
